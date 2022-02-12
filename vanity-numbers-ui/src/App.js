@@ -1,22 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
+import VanityNumberSearch from './VanityNumberSearch'
+import react from 'react';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Ian's Vanity Number Project
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p className="Main-text">
+          This web page allows you to view the 5 latest callers
+        </p>
+          <VanityNumberSearch/>
       </header>
     </div>
   );

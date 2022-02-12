@@ -6,6 +6,9 @@ const s3 = require("@aws-cdk/aws-s3");
 const cloudfront = require("@aws-cdk/aws-cloudfront");
 const origins = require("@aws-cdk/aws-cloudfront-origins");
 const deploy = require("@aws-cdk/aws-s3-deployment");
+const lambda = require("@aws-cdk/aws-lambda");
+const apigateway = require("@aws-cdk/aws-apigateway");
+const iam = require("@aws-cdk/aws-iam");
 class VanityUIStack extends cdk.Stack {
     constructor(scope, id) {
         super(scope, id, {
@@ -34,6 +37,29 @@ class VanityUIStack extends cdk.Stack {
             distribution: distribution,
             distributionPaths: ["/*"]
         });
+        // Lambda IAM Role to provide access to dynamoDB
+        const lambdaAccessRole = new iam.Role(this, 'VanityLambdaRole', {
+            assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com')
+        });
+        lambdaAccessRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess'));
+        // Lambda for accessing the DynamoDB table
+        const handler = new lambda.Function(this, "VanityNumberHandler", {
+            runtime: lambda.Runtime.NODEJS_14_X,
+            code: lambda.Code.fromAsset("build-lambda"),
+            handler: "app.lambdaHandler",
+            role: lambdaAccessRole
+        });
+        // API Gateway that represents the vanity numbers service
+        const api = new apigateway.RestApi(this, "vanity-numbers-api", {
+            restApiName: "Vanity Numbers Service",
+            description: "This service produces recently contacted vantity numbers."
+        });
+        // API Gateway integration that represents the handler which produces the 
+        const numbersIntegration = new apigateway.LambdaIntegration(handler, {
+            requestTemplates: { "application/json": '{ "statusCode": "200" }' }
+        });
+        // API endpoint for lambda integration
+        api.root.addMethod("GET", numbersIntegration);
     }
 }
 exports.VanityUIStack = VanityUIStack;
