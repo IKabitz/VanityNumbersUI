@@ -26,7 +26,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "cdk-build": "tsc --target ES2018 --moduleResolution node --module commonjs cdk/index.ts",
     "build-lambda": "tsc --target ES2018 --outDir build-lambda --moduleResolution node --module commonjs lambda-src/app.ts",
